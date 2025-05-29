@@ -22,23 +22,22 @@ jobs:
 
       - name: Clean remote directory
         run: |
-          ssh -o StrictHostKeyChecking=no azureuser@20.106.193.95 << EOF
+          ssh -o StrictHostKeyChecking=no azureuser@20.106.193.95 << 'EOF'
             which pm2 || npm install -g pm2
             pm2 delete all || true
             mkdir -p ~/backend-api
             rm -rf ~/backend-api/*
-
           EOF
 
-          - name: Copy files to VM
-            run: |
-              scp -r . azureuser@20.106.193.95:~/backend-api/
+      - name: Copy files to VM
+        run: |
+          scp -r . azureuser@20.106.193.95:~/backend-api/
 
-          - name: Install dependencies and start app
-            run: |
-              ssh -o StrictHostKeyChecking=no azureuser@20.106.193.95 << 'EOF'
-                cd ~/backend-api
-                npm install
-                npm run build
-                pm2 start npm --name backend-api -- run start
+      - name: Install dependencies and start app
+        run: |
+          ssh -o StrictHostKeyChecking=no azureuser@20.106.193.95 << 'EOF'
+            cd ~/backend-api
+            npm install
+            npm run build
+            pm2 start npm --name backend-api -- run start
           EOF
