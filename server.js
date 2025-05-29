@@ -9,6 +9,6 @@ app.prepare().then(() => {
         handle(req, res);
     }).listen(80, (err) => {
         if (err) throw err;
-        console.log("> Ready on http://localhost:80");
+        console.log("> Ready on the http://localhost:80");
     });
 });
