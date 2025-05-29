@@ -19,7 +19,6 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan 20.106.193.95 >> ~/.ssh/known_hosts
-
       - name: Clean remote directory
         run: |
           ssh -o StrictHostKeyChecking=no azureuser@20.106.193.95 << 'EOF'
@@ -28,11 +27,9 @@ jobs:
             mkdir -p ~/backend-api
             rm -rf ~/backend-api/*
           EOF
-
       - name: Copy files to VM
         run: |
           scp -r . azureuser@20.106.193.95:~/backend-api/
-
       - name: Install dependencies and start app
         run: |
           ssh -o StrictHostKeyChecking=no azureuser@20.106.193.95 << 'EOF'
