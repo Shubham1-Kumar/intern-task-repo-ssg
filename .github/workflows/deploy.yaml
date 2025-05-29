@@ -26,12 +26,13 @@ jobs:
             which pm2 || npm install -g pm2
             pm2 delete all || true
             mkdir -p ~/backend-api
+            sudo chmod -R 777 ~/backend-api
             sudo rm -rf ~/backend-api/*
           EOF
 
       - name: Copy files to VM
         run: |
-          scp -r . azureuser@20.106.193.95:~/backend-api/
+          rsync -av --exclude='.git' . azureuser@20.106.193.95:~/backend-api/
 
       - name: Install dependencies and start app
         run: |
