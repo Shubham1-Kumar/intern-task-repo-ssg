@@ -1,0 +1,37 @@
+name: Deploy API to VM
+
+on:
+  push:
+    branches:
+      - main  # <-- Use 'main' instead of 'master' if that's your default branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan 20.106.193.95 >> ~/.ssh/known_hosts
+
+      - name: Deploy API to VM
+        run: |
+          ssh -o StrictHostKeyChecking=no azureuser@20.106.193.95 << 'EOF'
+            pm2 delete all || true
+            cd ~/backend-api || mkdir ~/backend-api && cd ~/backend-api
+            rm -rf *
+            exit
+EOF
+          scp -r . azureuser@20.106.193.95:~/backend-api/
+          ssh -o StrictHostKeyChecking=no azureuser@20.106.193.95 << 'EOF'
+            cd ~/backend-api
+            npm install
+            npm run build
+            pm2 start npm --name backend-api -- run start
+EOF
