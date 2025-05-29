@@ -22,7 +22,8 @@ jobs:
 
       - name: Clean remote directory
         run: |
-          ssh -o StrictHostKeyChecking=no azureuser@20.106.193.95 << 'EOF'
+          ssh -o StrictHostKeyChecking=no azureuser@20.106.193.95 << EOF
+            which pm2 || npm install -g pm2
             pm2 delete all || true
             mkdir -p ~/backend-api
             rm -rf ~/backend-api/*
