@@ -22,7 +22,7 @@ jobs:
 
       - name: Prepare EC2 instance
         run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@3.110.218.166 << 'EOF'
+          ssh -o StrictHostKeyChecking=no ubuntu@43.204.116.137 << 'EOF'
             # Update & install curl
             sudo apt-get update
             sudo apt-get install -y curl
@@ -45,11 +45,11 @@ jobs:
 
       - name: Copy files to EC2 (excluding .git)
         run: |
-          rsync -av --exclude='.git' . ubuntu@3.110.218.166:~/backend-api/
+          rsync -av --exclude='.git' . ubuntu@43.204.116.137:~/backend-api/
 
       - name: Install dependencies & start app
         run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@3.110.218.166 << 'EOF'
+          ssh -o StrictHostKeyChecking=no ubuntu@43.204.116.137 << 'EOF'
             cd ~/backend-api
             npm install
             npm run build || true   # in case you don't have a build script
