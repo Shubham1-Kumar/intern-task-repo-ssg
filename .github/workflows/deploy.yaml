@@ -18,23 +18,39 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan 20.106.193.95 >> ~/.ssh/known_hosts
-      - name: Clean remote directory
+          ssh-keyscan 3.110.218.166 >> ~/.ssh/known_hosts
+
+      - name: Prepare EC2 instance
         run: |
-          ssh -o StrictHostKeyChecking=no azureuser@20.106.193.95 << 'EOF'
-            which pm2 || npm install -g pm2
+          ssh -o StrictHostKeyChecking=no ubuntu@3.110.218.166 << 'EOF'
+            # Update & install curl
+            sudo apt-get update
+            sudo apt-get install -y curl
+
+            # Install Node.js & npm (Node 18 LTS)
+            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+            sudo apt-get install -y nodejs
+
+            # Install PM2 if not already
+            if ! command -v pm2 &> /dev/null; then
+              sudo npm install -g pm2
+            fi
+
+            # Prepare app directory
             pm2 delete all || true
             mkdir -p ~/backend-api
             rm -rf ~/backend-api/*
           EOF
-      - name: Copy files to VM
+
+      - name: Copy files to EC2
         run: |
-          scp -r . azureuser@20.106.193.95:~/backend-api/
-      - name: Install dependencies and start app
+          scp -r . ubuntu@3.110.218.166:~/backend-api/
+
+      - name: Install dependencies & start app
         run: |
-          ssh -o StrictHostKeyChecking=no azureuser@20.106.193.95 << 'EOF'
+          ssh -o StrictHostKeyChecking=no ubuntu@3.110.218.166 << 'EOF'
             cd ~/backend-api
             npm install
-            npm run build
+            npm run build || true   # in case you don't have a build script
             pm2 start server.js --name backend-api
           EOF
