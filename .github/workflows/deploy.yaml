@@ -42,9 +42,9 @@ jobs:
             rm -rf ~/backend-api/*
           EOF
 
-      - name: Copy files to EC2
+      - name: Copy files to EC2 (excluding .git)
         run: |
-          scp -r . ubuntu@3.110.218.166:~/backend-api/
+          rsync -av --exclude='.git' . ubuntu@3.110.218.166:~/backend-api/
 
       - name: Install dependencies & start app
         run: |
